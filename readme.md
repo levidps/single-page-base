@@ -1,0 +1,3 @@
+# Single Page HTML Template
+* * *
+A base template for beginning a single page website. Contains a number of useful bits for ensuring the highest potential for SEO on a site that has minimal (if any) content: OG tags, template for an opengraph image, Google Analtyics code, Schema JSON block, manifest JSON file, various favicon image sizes, tags for responsive styling, along with Gulp files for compiling SCSS & JS. 
