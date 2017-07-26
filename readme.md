@@ -4,7 +4,7 @@ A base template for beginning a single page website. Contains a number of useful
 
 ---
 
-#### Setting up & running gulp
+## Setting up & running gulp
 1. Navigate to `/gulp` directory
 
 2. From terminal run 'npm install', this will install all the required dependencies listed in package.json _(you may need to be run as root/admin)_
@@ -21,5 +21,11 @@ A base template for beginning a single page website. Contains a number of useful
 	watch all files in `_js/` and `_css/` directories for changes and run js/css linting and compiling. 
 	
 ---
-#### Develpment Pipeline
+## Develpment Pipeline
 1. Improve Gulp functions for `source` & `dist` directories to improve deployment of sites.
+
+---
+## Examples
+• [Elemental Properties](https://elementalproperties.com.au/)
+• [Meet Martha](http://meetmartha.com.au/)
+• [Social State of Mind](https://socialstateofmind.com.au/)
