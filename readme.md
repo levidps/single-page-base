@@ -26,6 +26,7 @@ A base template for beginning a single page website. Contains a number of useful
 
 ---
 ## Examples
-• [Elemental Properties](https://elementalproperties.com.au/)
-• [Meet Martha](http://meetmartha.com.au/)
-• [Social State of Mind](https://socialstateofmind.com.au/)
+
+<a href="https://elementalproperties.com.au/" target="_blank">ELemental Properties</a>
+<a href="https://meetmartha.com.au/" target="_blank">Meet Martha</a>
+<a href="https://socialstateofmind.com.au/" target="_blank">Social State of Mind</a>
