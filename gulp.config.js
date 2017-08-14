@@ -6,11 +6,10 @@ module.exports = function() {
                 html: sourcePath + '*.html',
                 json: sourcePath + '*.json',
                 img : sourcePath + '_assets/**/*',
-                scss: sourcePath + '_css/_scss/**/*.scss',
+                scss: sourcePath + '_css/**/*.scss',
                 js  : sourcePath + '_js/**/*.js'
             },
             destination   : './_dist/',
-            stupid: 'stupid',
         };
 
     return config;

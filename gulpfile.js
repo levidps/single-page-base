@@ -58,7 +58,7 @@ gulp.task('js', function (cb) {
         jshint({esversion: 6}),
         jshint.reporter('default', { verbose: true }),
         gulpIf(isProd, minify()),
-        gulpIf(isProd, rename({ suffix:'.min' })),
+        rename({ suffix:'.min' }),
         gulpIf(isProd, removeLogging({ namespace: ['console', 'window.console'] })),
         gulp.dest(config.destination + 'js/')
     ], cb);
@@ -79,10 +79,15 @@ gulp.task('build', ['js', 'sass'], function() {
     var isProd      = args.prod;
     var sourceFiles = [
       config.sourceFiles.html,
-      config.sourceFiles.json,
-      config.sourceFiles.img
+      config.sourceFiles.json
     ];
     var htmlFilter = filter('**/*.html', {restore: true});
+
+    // for assets folder
+    pump([
+      gulp.src(config.sourceFiles.img),
+      gulp.dest(config.destination + 'assets')
+    ])
 
     // if --prod flag is passed then minify html and remove code
     pump([
