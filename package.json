@@ -1,0 +1,39 @@
+{
+  "name": "levidps",
+  "version": "1.0.1",
+  "description": "- compiling single page site for distribution",
+  "main": "./_src/scripts.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Levi Schmidt",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/levidps/single-page-base.git"
+  },
+  "license": "GNU General Public License (GPL)",
+  "devDependencies": {
+    "browser-sync": "^2.18.13",
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^3.1.1",
+    "gulp-filter": "^5.0.0",
+    "gulp-htmlmin": "^3.0.0",
+    "gulp-if": "^2.0.2",
+    "gulp-jshint": "^2.0.4",
+    "gulp-minify-css": "^1.2.4",
+    "gulp-notify": "^3.0.0",
+    "gulp-plumber": "^1.1.0",
+    "gulp-remove-logging": "^1.2.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-run": "^1.7.1",
+    "gulp-sass": "^3.1.0",
+    "gulp-uglify": "^3.0.0",
+    "gulp-util": "^3.0.8",
+    "jshint": "^2.9.5",
+    "node-bourbon": "^4.2.8",
+    "pump": "^1.0.2",
+    "run-sequence": "^2.1.0",
+    "uglify-es": "^3.0.20",
+    "yargs": "^8.0.2"
+  }
+}

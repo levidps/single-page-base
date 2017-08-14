@@ -1,3 +1,12 @@
+# Ignore NPM Modules #
+######################
 node_modules/
+
+# SCSS Cache #
+##############
 .sass-cache/
+
+# System / IDE #
+################
 .DS_Store
+.idea
