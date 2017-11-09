@@ -6,6 +6,10 @@ node_modules/
 ##############
 .sass-cache/
 
+# Distribution #
+################
+_dist/*
+
 # System / IDE #
 ################
 .DS_Store

@@ -7,14 +7,14 @@ var gulp            = require('gulp'),
     sass          	= require('gulp-sass'),
     autoprefixer    = require('gulp-autoprefixer'),
     minifycss       = require('gulp-minify-css'),
-    jshint 			    = require('gulp-jshint'),
-    rename			    = require('gulp-rename'),
-    plumber			    = require('gulp-plumber'),
-    notify			    = require('gulp-notify'),
-    uglify 			    = require('uglify-es'),
-    composer 		    = require('gulp-uglify/composer'),
-    pump 			      = require('pump'),
-    htmlmin 		    = require('gulp-htmlmin'),
+    jshint 			= require('gulp-jshint'),
+    rename			= require('gulp-rename'),
+    plumber			= require('gulp-plumber'),
+    notify			= require('gulp-notify'),
+    uglify 			= require('uglify-es'),
+    composer 		= require('gulp-uglify/composer'),
+    pump 			= require('pump'),
+    htmlmin 		= require('gulp-htmlmin'),
     removeLogging   = require("gulp-remove-logging"),
     runSequence     = require('run-sequence'),
     run             = require('gulp-run'),
@@ -44,7 +44,7 @@ gulp.task('sass', function(cb) {
 		autoprefixer('last 2 version', 'safari 5', 'ie 7', 'ie 8', 'ie 9', 'opera 12.1', 'ios 6', 'android 4'),
 		gulpIf(isProd, minifycss()),
 		rename({ suffix:'.min' }),
-		gulp.dest( config.destination + 'css/')
+		gulp.dest( config.destination + '_css/')
     ], cb);
 });
 
@@ -60,7 +60,7 @@ gulp.task('js', function (cb) {
         gulpIf(isProd, minify()),
         rename({ suffix:'.min' }),
         gulpIf(isProd, removeLogging({ namespace: ['console', 'window.console'] })),
-        gulp.dest(config.destination + 'js/')
+        gulp.dest(config.destination + '_js/')
     ], cb);
 
 });
@@ -86,7 +86,7 @@ gulp.task('build', ['js', 'sass'], function() {
     // for assets folder
     pump([
       gulp.src(config.sourceFiles.img),
-      gulp.dest(config.destination + 'assets')
+      gulp.dest(config.destination + '_assets')
     ])
 
     // if --prod flag is passed then minify html and remove code
