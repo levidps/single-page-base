@@ -8,6 +8,7 @@ node_modules/
 
 # Distribution #
 ################
+_dist/
 _dist/*
 
 # System / IDE #
