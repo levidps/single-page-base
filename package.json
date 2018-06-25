@@ -4,7 +4,8 @@
   "description": "- compiling single page site for distribution",
   "main": "./_src/scripts.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "gulp --dev",
+    "prod": "gulp --prod"
   },
   "author": "Levi Schmidt",
   "repository": {
@@ -13,8 +14,8 @@
   },
   "license": "GPL-2.0",
   "devDependencies": {
-    "browser-sync": "^2.18.13",
-    "gulp": "^3.9.1",
+    "browser-sync": "^2.24.5",
+    "gulp": "^4.0.0",
     "gulp-autoprefixer": "^3.1.1",
     "gulp-filter": "^5.0.0",
     "gulp-htmlmin": "^3.0.0",
@@ -26,7 +27,7 @@
     "gulp-remove-logging": "^1.2.0",
     "gulp-rename": "^1.2.2",
     "gulp-run": "^1.7.1",
-    "gulp-sass": "^3.1.0",
+    "gulp-sass": "^4.0.1",
     "gulp-uglify": "^3.0.0",
     "gulp-util": "^3.0.8",
     "jshint": "^2.9.5",
