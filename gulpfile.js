@@ -16,11 +16,9 @@ var gulp            = require('gulp'),
     pump 			= require('pump'),
     htmlmin 		= require('gulp-htmlmin'),
     removeLogging   = require("gulp-remove-logging"),
-    runSequence     = require('gulp4-run-sequence'),
-    run             = require('gulp-run'),
+	del             = require("del"),
     browserSync     = require('browser-sync').create();
 
-var fs          = require('fs');
 var minify      = composer(uglify, console);
 var log         = util.log;
 var colors      = util.colors;
@@ -32,8 +30,13 @@ var plumberErrorHandler = {
 	})
 };
 
+// Clean Function
+gulp.task('clean', function(done) {
+	del('_dist', done);
+});
+
 // bourbon > prefix > minify > rename > distribute
-gulp.task('sass', function(cb) {
+gulp.task('sass', function(done) {
     var isProd = args.prod;
 
     pump([
@@ -45,12 +48,12 @@ gulp.task('sass', function(cb) {
 		gulpIf(isProd, minifycss()),
 		rename({ suffix:'.min' }),
 		gulp.dest( config.destination + '_css/'),
-		browserSync.reload({stream:true})
-    ], cb);
+	    browserSync.stream({once: true})
+    ], done);
 });
 
 // es v6 > jshint > minify > rename > distribute
-gulp.task('js', function (cb) {
+gulp.task('js', function (done) {
     var isProd = args.prod;
 
     pump([
@@ -62,31 +65,23 @@ gulp.task('js', function (cb) {
         rename({ suffix:'.min' }),
         gulpIf(isProd, removeLogging({ namespace: ['console', 'window.console'] })),
         gulp.dest(config.destination + '_js/'),
-		browserSync.reload({stream:true})
-    ], cb);
+	    browserSync.stream({once: true})
+    ], done);
 
-});
-
-// watch & compile all files > build
-gulp.task('watch', function(cb) {
-	if(args.dev) {
-		gulp.watch('_src/**/*', gulp.series('build', browserSync.reload) );
-	}
-	cb();
 });
 
 // Move All assets to _dist
-gulp.task('move-assets', function(cb) {
+gulp.task('move-assets', function(done) {
 	// for assets folder
 	pump([
 		gulp.src(config.sourceFiles.img),
 		gulp.dest(config.destination + '_assets'),
-		browserSync.reload({stream:true})
-	], cb);
+		browserSync.stream({once: true})
+	], done);
 });
 
 // Run final output of prod on HTML files
-gulp.task('output-prod', function(cb) {
+gulp.task('output-prod', function(done) {
 	var isProd      = args.prod;
 	var sourceFiles = [
 		config.sourceFiles.html,
@@ -100,36 +95,40 @@ gulp.task('output-prod', function(cb) {
 		gulpIf(isProd, htmlFilter),
 		gulpIf(isProd, htmlmin({collapseWhitespace: true})),
 		gulpIf(isProd, htmlFilter.restore),
-		gulp.dest(config.destination),
-		browserSync.reload({stream:true})
+		gulp.dest(config.destination)
 	], function(err) {
 		if (typeof err === 'undefined' && browserSync.active) {
-			browserSync.reload();
+			browserSync.stream({once: true})
 		}
-	}, cb);
+	});
+
+	done();
 });
 
 // Serve BrwoserSync if Dev
-gulp.task('serve', function(cb) {
-	if(args.dev) {
-		startBrowserSync();
-	}
-	cb();
+gulp.task('serve', function(done) {
+	browserSync.init({
+		server: {
+			baseDir: './_dist/'
+		},
+		port: 3000,
+		notify: false
+	}, done);
 });
 
 // build > js/css/html/images
-// run: `gulp --deploy` for production release
 gulp.task('build', gulp.series('js', 'sass', 'move-assets', 'output-prod', function(done) {
     done();
 }));
 
 // lists usage of gulp --prod and gulp --dev if no --prod or --dev flag is passed
-gulp.task('default', gulp.series('build', 'serve', 'watch', function(done) {
+gulp.task('default', gulp.series('build', 'serve', function(done) {
 
     if (args.prod) {
         log('Site ready for production: ' + config.destination);
     } else if(args.dev) {
 		log('Site is now being served by BrowserSync');
+	    gulp.watch('_src/**/*', gulp.series('build') );
 	}  else {
         log(colors.blue.bold('\n GULP USAGE: \n'),
             colors.red.bold('gulp --prod: '), 'Build release version \n',
@@ -139,11 +138,3 @@ gulp.task('default', gulp.series('build', 'serve', 'watch', function(done) {
     done();
 }));
 
-// Helper functions
-function startBrowserSync() {
-    browserSync.init({
-      server: {
-        baseDir: "./_dist/"
-      }
-    });
-}
