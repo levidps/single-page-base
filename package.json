@@ -36,5 +36,8 @@
     "run-sequence": "^2.1.0",
     "uglify-es": "^3.0.20",
     "yargs": "^8.0.2"
+  },
+  "dependencies": {
+    "gulp4-run-sequence": "0.0.3"
   }
 }

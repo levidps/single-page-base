@@ -16,7 +16,7 @@ var gulp            = require('gulp'),
     pump 			= require('pump'),
     htmlmin 		= require('gulp-htmlmin'),
     removeLogging   = require("gulp-remove-logging"),
-    runSequence     = require('run-sequence'),
+    runSequence     = require('gulp4-run-sequence'),
     run             = require('gulp-run'),
     browserSync     = require('browser-sync').create();
 
@@ -66,15 +66,14 @@ gulp.task('js', function (cb) {
 });
 
 // watch & compile all files > build
-gulp.task('watch', function() {
+gulp.task('watch', function(cb) {
 	gulp.watch('./_src/**/*', ['build']);
-
+	cb();
 });
-
 
 // build > js/css/html/images
 // run: `gulp --deploy` for production release
-gulp.task('build', ['js', 'sass'], function() {
+gulp.task('build', gulp.parallel('js', 'sass', function(cb) {
 
     var isProd      = args.prod;
     var sourceFiles = [
@@ -87,7 +86,7 @@ gulp.task('build', ['js', 'sass'], function() {
     pump([
       gulp.src(config.sourceFiles.img),
       gulp.dest(config.destination + '_assets')
-    ])
+    ]);
 
     // if --prod flag is passed then minify html and remove code
     pump([
@@ -101,7 +100,9 @@ gulp.task('build', ['js', 'sass'], function() {
             browserSync.reload();
         }
     });
-});
+
+	cb();
+}));
 
 // lists usage of gulp --prod and gulp --dev if no --prod or --dev flag is passed
 gulp.task('default', function() {
@@ -113,7 +114,7 @@ gulp.task('default', function() {
         startBrowserSync();
         runSequence('build', 'watch');
     } else {
-        log(colors.blue.bold('\n USAGE: \n'),
+        log(colors.blue.bold('\n GULP USAGE: \n'),
             colors.red.bold('gulp --prod: '), 'Build release version of the PxS UI for customers to use \n',
             colors.red.bold('gulp --dev : '), 'Build devlopement (test/debug) version of the PxS UI'
         );
