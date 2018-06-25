@@ -44,7 +44,8 @@ gulp.task('sass', function(cb) {
 		autoprefixer('last 2 version', 'safari 5', 'ie 7', 'ie 8', 'ie 9', 'opera 12.1', 'ios 6', 'android 4'),
 		gulpIf(isProd, minifycss()),
 		rename({ suffix:'.min' }),
-		gulp.dest( config.destination + '_css/')
+		gulp.dest( config.destination + '_css/'),
+		browserSync.reload({stream:true})
     ], cb);
 });
 
@@ -60,25 +61,31 @@ gulp.task('js', function (cb) {
         gulpIf(isProd, minify()),
         rename({ suffix:'.min' }),
         gulpIf(isProd, removeLogging({ namespace: ['console', 'window.console'] })),
-        gulp.dest(config.destination + '_js/')
+        gulp.dest(config.destination + '_js/'),
+		browserSync.reload({stream:true})
     ], cb);
 
 });
 
 // watch & compile all files > build
 gulp.task('watch', function(cb) {
-	gulp.watch('./_src/**/*', ['build']);
+	if(args.dev) {
+		gulp.watch('_src/**/*', gulp.series('build', browserSync.reload) );
+	}
 	cb();
 });
 
+// Move All assets to _dist
 gulp.task('move-assets', function(cb) {
 	// for assets folder
 	pump([
 		gulp.src(config.sourceFiles.img),
-		gulp.dest(config.destination + '_assets')
+		gulp.dest(config.destination + '_assets'),
+		browserSync.reload({stream:true})
 	], cb);
 });
 
+// Run final output of prod on HTML files
 gulp.task('output-prod', function(cb) {
 	var isProd      = args.prod;
 	var sourceFiles = [
@@ -94,11 +101,20 @@ gulp.task('output-prod', function(cb) {
 		gulpIf(isProd, htmlmin({collapseWhitespace: true})),
 		gulpIf(isProd, htmlFilter.restore),
 		gulp.dest(config.destination),
+		browserSync.reload({stream:true})
 	], function(err) {
 		if (typeof err === 'undefined' && browserSync.active) {
 			browserSync.reload();
 		}
 	}, cb);
+});
+
+// Serve BrwoserSync if Dev
+gulp.task('serve', function(cb) {
+	if(args.dev) {
+		startBrowserSync();
+	}
+	cb();
 });
 
 // build > js/css/html/images
@@ -108,22 +124,20 @@ gulp.task('build', gulp.series('js', 'sass', 'move-assets', 'output-prod', funct
 }));
 
 // lists usage of gulp --prod and gulp --dev if no --prod or --dev flag is passed
-gulp.task('default', function(done) {
+gulp.task('default', gulp.series('build', 'serve', 'watch', function(done) {
 
     if (args.prod) {
-        runSequence('build', 'watch');
         log('Site ready for production: ' + config.destination);
     } else if(args.dev) {
-        startBrowserSync();
-        runSequence('build', 'watch');
-    } else {
+		log('Site is now being served by BrowserSync');
+	}  else {
         log(colors.blue.bold('\n GULP USAGE: \n'),
             colors.red.bold('gulp --prod: '), 'Build release version \n',
-            colors.red.bold('gulp --dev : '), 'Build devlopement (test/debug) && launch browserSync'
+            colors.red.bold('gulp --dev : '), 'Build devlopement (test/debug) && launch BrowserSync'
         );
     }
     done();
-});
+}));
 
 // Helper functions
 function startBrowserSync() {
