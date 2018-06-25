@@ -71,41 +71,44 @@ gulp.task('watch', function(cb) {
 	cb();
 });
 
+gulp.task('move-assets', function(cb) {
+	// for assets folder
+	pump([
+		gulp.src(config.sourceFiles.img),
+		gulp.dest(config.destination + '_assets')
+	], cb);
+});
+
+gulp.task('output-prod', function(cb) {
+	var isProd      = args.prod;
+	var sourceFiles = [
+		config.sourceFiles.html,
+		config.sourceFiles.json
+	];
+	var htmlFilter = filter('**/*.html', {restore: true});
+
+	// if --prod flag is passed then minify html and remove code
+	pump([
+		gulp.src(sourceFiles),
+		gulpIf(isProd, htmlFilter),
+		gulpIf(isProd, htmlmin({collapseWhitespace: true})),
+		gulpIf(isProd, htmlFilter.restore),
+		gulp.dest(config.destination),
+	], function(err) {
+		if (typeof err === 'undefined' && browserSync.active) {
+			browserSync.reload();
+		}
+	}, cb);
+});
+
 // build > js/css/html/images
 // run: `gulp --deploy` for production release
-gulp.task('build', gulp.parallel('js', 'sass', function(cb) {
-
-    var isProd      = args.prod;
-    var sourceFiles = [
-      config.sourceFiles.html,
-      config.sourceFiles.json
-    ];
-    var htmlFilter = filter('**/*.html', {restore: true});
-
-    // for assets folder
-    pump([
-      gulp.src(config.sourceFiles.img),
-      gulp.dest(config.destination + '_assets')
-    ]);
-
-    // if --prod flag is passed then minify html and remove code
-    pump([
-        gulp.src(sourceFiles),
-        gulpIf(isProd, htmlFilter),
-        gulpIf(isProd, htmlmin({collapseWhitespace: true})),
-        gulpIf(isProd, htmlFilter.restore),
-        gulp.dest(config.destination),
-    ], function(err) {
-        if (typeof err === 'undefined' && browserSync.active) {
-            browserSync.reload();
-        }
-    });
-
-	cb();
+gulp.task('build', gulp.series('js', 'sass', 'move-assets', 'output-prod', function(done) {
+    done();
 }));
 
 // lists usage of gulp --prod and gulp --dev if no --prod or --dev flag is passed
-gulp.task('default', function() {
+gulp.task('default', function(done) {
 
     if (args.prod) {
         runSequence('build', 'watch');
@@ -115,10 +118,11 @@ gulp.task('default', function() {
         runSequence('build', 'watch');
     } else {
         log(colors.blue.bold('\n GULP USAGE: \n'),
-            colors.red.bold('gulp --prod: '), 'Build release version of the PxS UI for customers to use \n',
-            colors.red.bold('gulp --dev : '), 'Build devlopement (test/debug) version of the PxS UI'
+            colors.red.bold('gulp --prod: '), 'Build release version \n',
+            colors.red.bold('gulp --dev : '), 'Build devlopement (test/debug) && launch browserSync'
         );
     }
+    done();
 });
 
 // Helper functions
