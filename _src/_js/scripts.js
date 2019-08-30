@@ -1,7 +1,7 @@
 
 
 // Functions to preform on load
-var init = function() {
+const init = function() {
 
 	console.log('HELLO World!');
 

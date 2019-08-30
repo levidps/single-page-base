@@ -3,23 +3,22 @@ var gulp            = require('gulp'),
     util            = require('gulp-util'),
     gulpIf          = require('gulp-if'),
     args            = require('yargs').argv,
+	esLint			= require('gulp-eslint'),
     filter          = require('gulp-filter'),
     sass          	= require('gulp-sass'),
     autoprefixer    = require('gulp-autoprefixer'),
     minifycss       = require('gulp-minify-css'),
-    jshint 			= require('gulp-jshint'),
     rename			= require('gulp-rename'),
     plumber			= require('gulp-plumber'),
     notify			= require('gulp-notify'),
-    uglify 			= require('uglify-es'),
-    composer 		= require('gulp-uglify/composer'),
     pump 			= require('pump'),
     htmlmin 		= require('gulp-htmlmin'),
     removeLogging   = require("gulp-remove-logging"),
+    uglify 			= require('gulp-uglify-es').default,
+    babel 			= require('gulp-babel');
 	del             = require("del"),
     browserSync     = require('browser-sync').create();
 
-var minify      = composer(uglify, console);
 var log         = util.log;
 var colors      = util.colors;
 
@@ -59,11 +58,31 @@ gulp.task('js', function (done) {
     pump([
         gulp.src(config.sourceFiles.js),
         plumber(plumberErrorHandler),
-        jshint({esversion: 6}),
-        jshint.reporter('default', { verbose: true }),
-        gulpIf(isProd, minify()),
-        rename({ suffix:'.min' }),
         gulpIf(isProd, removeLogging({ namespace: ['console', 'window.console'] })),
+	    babel({
+		  "presets": [
+		    [
+		      "@babel/preset-env",
+		      {
+		        "useBuiltIns"	: "entry",
+		        "corejs"		: '3.x'
+		      }
+		    ]
+		  ]
+		}),
+        gulpIf(isProd, uglify({
+			mangle: false,
+			warnings: true,
+			ecma: 5,
+			ie8: true,
+			compress: {
+				hoist_funs: false,
+				hoist_vars: false,
+				hoist_props: false,
+				keep_classnames: true
+			}
+        })),
+        rename({ suffix:'.min' }),
         gulp.dest(config.destination + '_js/'),
 	    browserSync.stream({once: true})
     ], done);
@@ -105,8 +124,13 @@ gulp.task('output-prod', function(done) {
 	done();
 });
 
+// build > js/css/html/images
+gulp.task('build', gulp.parallel('js', 'sass', 'move-assets', 'output-prod', function(done) {
+    done();
+}));
+
 // Serve BrwoserSync if Dev
-gulp.task('serve', function(done) {
+const startServer = function(done) {
 	browserSync.init({
 		server: {
 			baseDir: './_dist/'
@@ -114,20 +138,16 @@ gulp.task('serve', function(done) {
 		port: 3000,
 		notify: false
 	}, done);
-});
-
-// build > js/css/html/images
-gulp.task('build', gulp.series('js', 'sass', 'move-assets', 'output-prod', function(done) {
-    done();
-}));
+};
 
 // lists usage of gulp --prod and gulp --dev if no --prod or --dev flag is passed
-gulp.task('default', gulp.series('build', 'serve', function(done) {
+gulp.task('default', gulp.series('build', function(done) {
 
     if (args.prod) {
         log('Site ready for production: ' + config.destination);
     } else if(args.dev) {
 		log('Site is now being served by BrowserSync');
+	    startServer();
 	    gulp.watch('_src/**/*', gulp.series('build') );
 	}  else {
         log(colors.blue.bold('\n GULP USAGE: \n'),
